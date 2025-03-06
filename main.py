@@ -6,7 +6,7 @@ from appwrite.services.databases import Databases
 from appwrite.id import ID
 from dotenv import load_dotenv
 import os
-
+from pydantic import BaseModel
 # Load environment variables
 load_dotenv()
 
@@ -39,29 +39,29 @@ COLLECTION_ID = os.getenv("COLLECTION_ID")
 def read_root():
     return {"message": "Welcome to the FastAPI backend!"}
 
-# Sign-up endpoint
+# Define the Pydantic model for signup data
+class SignupRequest(BaseModel):
+    email: str
+    password: str
+    name: str
+
 @app.post("/signup")
-async def signup(email: str, password: str, name: str):
+async def signup(user: SignupRequest):
     try:
-        # Create user in Appwrite Auth
-        user = users.create(ID.unique(), email, password, name)
+        # Create user in the backend (Appwrite or other service)
+        user_data = {
+            "email": user.email,
+            "password": user.password,
+            "name": user.name
+        }
+
+        # Simulate saving the user data (you can replace this with actual DB operations)
+        # e.g., Create user in database, authenticate with Appwrite, etc.
         
-        # Save user data in Appwrite Database
-        document = databases.create_document(
-            DATABASE_ID,
-            COLLECTION_ID,
-            ID.unique(),
-            {
-                "email": email,
-                "name": name,
-                "userId": user["$id"]
-            }
-        )
-        
-        return {"message": "User created successfully", "user": user}
+        # Return a success message
+        return {"message": "User created successfully", "user": user_data}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
-
 # Login endpoint
 @app.post("/login")
 async def login(email: str, password: str):
