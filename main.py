@@ -106,9 +106,7 @@ async def login(email: str, password: str):
     
 
 # Check if a user exists
-
-    
-    
+       
 @app.get("/check-user/{email}")
 async def check_user(email: str):
     user = users.get(email)  # Fetch user from database
@@ -137,6 +135,28 @@ async def get_user(document_id: str):
     except Exception as e:
         print("Error fetching document:", str(e))
 
+        # Check if the document was not found
+        if "not found" in str(e):
+            raise HTTPException(status_code=404, detail="Document not found")
+        raise HTTPException(status_code=400, detail=str(e))
+    
+# Update a user by ID
+@app.put("/user/{document_id}")
+async def update_user(document_id: str, name: str):
+    try:
+        # Update the document
+        document = databases.update_document(
+            DATABASE_ID,
+            COLLECTION_ID,
+            document_id,
+            {"name": name}
+        )
+        return {"message": "User updated successfully", "user": document}
+    except Exception as e:
+        print("Error updating document:", str(e))
+        raise HTTPException(status_code=400, detail=str(e))
+    
+    
 
 
 # Run the FastAPI app
