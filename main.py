@@ -157,6 +157,34 @@ async def update_user(document_id: str, name: str):
         raise HTTPException(status_code=400, detail=str(e))
     
     
+# Delete a user by ID
+@app.delete("/user/{document_id}")
+async def delete_user(document_id: str):
+    try:
+        # Delete the document
+        databases.delete_document(DATABASE_ID, COLLECTION_ID, document_id)
+        return {"message": "User deleted successfully"}
+    except Exception as e:
+        print("Error deleting document:", str(e))
+        raise HTTPException(status_code=400, detail=str(e))
+    
+
+# update user by ID
+@app.put("/user/{document_id}")
+async def update_user(document_id: str, name: str):
+    try:
+        # Update the document
+        document = databases.update_document(
+            DATABASE_ID,
+            COLLECTION_ID,
+            document_id,
+            {"name": name}
+        )
+        return {"message": "User updated successfully", "user": document}
+    except Exception as e:
+        print("Error updating document:", str(e))
+        raise HTTPException(status_code=400, detail=str(e))
+    
 
 
 # Run the FastAPI app
