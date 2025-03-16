@@ -186,6 +186,35 @@ async def update_user(document_id: str, name: str):
         raise HTTPException(status_code=400, detail=str(e))
     
 
+# update user by profile
+@app.put("/profile/{document_id}")
+async def update_profile(document_id: str, name: str):
+    try:
+        # Update the document
+        document = databases.update_document(
+            DATABASE_ID,
+            COLLECTION_ID,
+            document_id,
+            {"name": name}
+        )
+        return {"message": "User updated successfully", "user": document}
+    except Exception as e:
+        print("Error updating document:", str(e))
+        raise HTTPException(status_code=400, detail=str(e))
+    
+# Get all users from the database
+@app.get("/users")
+async def get_users():
+    try:
+        # Fetch all documents from the database
+        documents = databases.list_documents(DATABASE_ID, COLLECTION_ID)
+        return {"users": documents["documents"]}
+    except Exception as e:
+        print("Error fetching documents:", str(e))
+        raise HTTPException(status_code=400, detail=str(e))
+    
+    
+
 
 # Run the FastAPI app
 if __name__ == "__main__":
